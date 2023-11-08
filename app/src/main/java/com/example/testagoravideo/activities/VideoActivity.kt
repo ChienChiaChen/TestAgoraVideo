@@ -24,11 +24,11 @@ class VideoActivity : AppCompatActivity() {
 
     private val mRtcEventHandler: IRtcEngineEventHandler = object : IRtcEngineEventHandler() {
         override fun onUserOffline(uid: Int, reason: Int) {
+            showMessage("Remote user left")
             runOnUiThread { onRemoteUserLeft() }
         }
 
         override fun onUserMuteVideo(uid: Int, muted: Boolean) {
-            showMessage(if (muted) "Muted" else "Unmuted")
             runOnUiThread { onRemoteUserVideoMuted(uid, muted) }
         }
 
@@ -38,11 +38,11 @@ class VideoActivity : AppCompatActivity() {
         }
 
         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-            runOnUiThread { setupRemoteVideo(uid) }
+            showMessage("Joined channel successfully")
         }
 
         override fun onUserJoined(uid: Int, elapsed: Int) {
-            showMessage("Remote user joined $uid")
+            showMessage("Remote user joined")
             runOnUiThread { setupRemoteVideo(uid) }
         }
     }
