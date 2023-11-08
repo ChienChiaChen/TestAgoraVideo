@@ -1,5 +1,7 @@
 package com.example.testagoravideo.activities
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.SurfaceView
 import android.view.View
@@ -49,7 +51,8 @@ class VideoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
         channelName = intent.getStringExtra(MainActivity.channelMessage)
-        findViewById<TextView>(R.id.txtChannelName).text = getString(R.string.str_channel_name, channelName)
+        findViewById<TextView>(R.id.txtChannelName).text =
+            getString(R.string.str_channel_name, channelName)
         initAgoraEngineAndJoinChannel()
     }
 
@@ -148,6 +151,15 @@ class VideoActivity : AppCompatActivity() {
     fun onLocalAudioMuteClicked(view: View) {
         view.changeSelectedColor()
         mRtcEngine?.muteLocalAudioStream(view.isSelected)
+    }
+
+    companion object {
+        fun open(context: Context, channelName: String) {
+            val intent = Intent(context, VideoActivity::class.java).apply {
+                putExtra(MainActivity.channelMessage, channelName)
+            }
+            context.startActivity(intent)
+        }
     }
 
 }

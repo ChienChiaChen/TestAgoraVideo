@@ -1,15 +1,14 @@
 package com.example.testagoravideo.activities
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import com.example.testagoravideo.R
 import com.example.testagoravideo.utils.permission.AppPermission
-import com.example.testagoravideo.utils.permission.isPermissionGranted
+import com.example.testagoravideo.utils.permission.PermissionObserver
+import com.example.testagoravideo.utils.permission.isAllPermissionGranted
 import com.example.testagoravideo.utils.permission.openPermissionSettingsScreen
 import com.example.testagoravideo.utils.showMessage
 import com.example.testagoravideo.utils.snackbarWithAction
@@ -20,16 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        AppPermission.permissions.forEach {
-            if (!isPermissionGranted(it)) {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    AppPermission.permissions.map { it.permissionName }.toTypedArray(),
-                    AppPermission.permissionsRequestCode
-                )
-                return@forEach
-            }
-        }
+        lifecycle.addObserver(PermissionObserver(this@MainActivity))
     }
 
     override fun onRequestPermissionsResult(
@@ -52,15 +42,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSubmit(view: View?) {
-        val channel = findViewById<View>(R.id.edtChannelName) as EditText
-        val channelName = channel.text.toString()
-        if (channelName.isBlank()) {
-            showMessage(getString(R.string.str_error_blank_name))
-            return
+        if (isAllPermissionGranted()) {
+            val channel = findViewById<View>(R.id.edtChannelName) as EditText
+            val channelName = channel.text.toString()
+            if (channelName.isBlank()) {
+                showMessage(getString(R.string.str_error_blank_name))
+                return
+            }
+            VideoActivity.open(this@MainActivity, channelName)
+        } else {
+            openPermissionSettingsScreen()
         }
-        val intent = Intent(this, VideoActivity::class.java)
-        intent.putExtra(channelMessage, channelName)
-        startActivity(intent)
     }
 
 
